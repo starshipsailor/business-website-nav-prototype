@@ -1,486 +1,473 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <!-- CRITICAL: Ensure the browser reads this as HTML -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wise Business Navigation Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font family -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+            height: 200vh; /* Add height for scrolling visibility */
+        }
+        /* Tailwind configuration for custom colors */
+        .mega-menu {
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-5px);
+            pointer-events: none;
+            z-index: 50;
+            position: relative; /* CRITICAL: Enables absolute positioning of side-panel inside */
+        }
+        .mega-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* Styling for the new localized side panel */
+        .side-panel {
+            position: absolute;
+            left: 50%; /* Starts exactly after the first two 1/4 columns (50% of the menu width) */
+            width: 50%; /* Covers the last two 1/4 columns */
+            height: 100%; /* Make panel full height to cover Resources/Pricing */
+            top: 0; /* Align panel to the top of the content area */
+            padding-top: 2rem; /* Match the padding-top of the content flex container */
+            padding-bottom: 2rem; /* Match the padding-bottom of the content flex container */
+            
+            /* Initial state: Hidden, compressed */
+            opacity: 0;
+            pointer-events: none;
+            transform: scaleX(0); 
+            transform-origin: left;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Soft shadow */
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            z-index: 60;
+        }
+
+        .side-panel.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scaleX(1);
+        }
+
+        /* Pointer/Arrow Styling */
+        .side-panel::before {
+            content: '';
+            position: absolute;
+            top: var(--pointer-top, 50%); /* Dynamic top position set by JS */
+            left: 0; 
+            width: 0;
+            height: 0;
+            /* Triangle shape pointing left */
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 12px solid #fff; /* White arrow body */
+            z-index: 61;
+            transform: translateY(-50%) translateX(-12px); /* Correctly position and center the arrow */
+        }
+
+        /* Custom list style */
+        .feature-list {
+            list-style: none; /* Remove default bullet */
+            padding-left: 0;
+            margin-top: 1rem;
+        }
+        .feature-list li {
+            position: relative;
+            /* No padding-left here, we'll let the icon handle spacing */
+            margin-bottom: 0.75rem; /* Increased spacing for icons */
+            font-size: 0.875rem; /* text-sm */
+            color: #4C5D73;
+        }
+        /* REMOVING the ::before element that created the dash */
+        .feature-list li a {
+            display: flex; /* Use flex to align icon and text */
+            align-items: center;
+            color: #4C5D73;
+            transition: color 0.15s;
+        }
+        .feature-list li a:hover {
+            color: #00B974; /* Wise green on hover */
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wise-green': '#00B974',
+                        'wise-dark-green': '#009F66',
+                        'wise-grey': '#4C5D73',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Wise Business Navigation Prototype&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Use Inter font family --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background-color: #f8f8f8;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 200vh; /* Add height for scrolling visibility */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Tailwind configuration for custom colors */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.mega-menu {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s ease-in-out;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>visibility: hidden;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-5px);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 50;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative; /* CRITICAL: Enables absolute positioning of side-panel inside */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.mega-menu.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>visibility: visible;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: auto;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Styling for the new localized side panel */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.side-panel {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 50%; /* Starts exactly after the first two 1/4 columns (50% of the menu width) */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 50%; /* Covers the last two 1/4 columns */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 100%; /* Make panel full height to cover Resources/Pricing */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 0; /* Align panel to the top of the content area */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding-top: 2rem; /* Match the padding-top of the content flex container */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding-bottom: 2rem; /* Match the padding-bottom of the content flex container */</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>/* Initial state: Hidden, compressed */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: scaleX(0);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform-origin: left;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Soft shadow */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 60;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.side-panel.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>opacity: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pointer-events: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: scaleX(1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Pointer/Arrow Styling */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.side-panel::before {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>content: '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: var(--pointer-top, 50%); /* Dynamic top position set by JS */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 0;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>height: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>/* Triangle shape pointing left */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-top: 10px solid transparent;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-bottom: 10px solid transparent;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-right: 12px solid #fff; /* White arrow body */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 61;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transform: translateY(-50%) translateX(-12px); /* Correctly position and center the arrow */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* Custom list style */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feature-list {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>list-style: none; /* Remove default bullet */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding-left: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 1rem;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feature-list li {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>/* No padding-left here, we'll let the icon handle spacing */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 0.75rem; /* Increased spacing for icons */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 0.875rem; /* text-sm */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #4C5D73;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>/* REMOVING the ::before element that created the dash */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feature-list li a {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex; /* Use flex to align icon and text */</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #4C5D73;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: color 0.15s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.feature-list li a:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #00B974; /* Wise green on hover */</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>tailwind.config = {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>theme: {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>extend: {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>colors: {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'wise-green': '#00B974',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'wise-dark-green': '#009F66',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'wise-grey': '#4C5D73',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body class="pt-10"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Top Banner (as seen in image) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="bg-wise-green text-white text-center py-2 text-sm"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>Learn how Wise can help your business. &lt;a href="#" class="underline font-semibold"&gt;Register for webinar on 14th October&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="absolute right-4 top-2 text-white/80 hover:text-white"&gt;&amp;times;&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Main Navigation Bar --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;header class="bg-white shadow-md z-50 sticky top-0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Left Side: Logo and Main Tabs --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex items-center space-x-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="font-extrabold text-2xl text-wise-grey"&gt;wise&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="hidden sm:flex space-x-6 text-wise-grey text-sm font-medium"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;a href="#" class="py-2 hover:text-black"&gt;Personal&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;a href="#"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                       </span>id="business-link"</p>
-<p class="p1"><span class="Apple-converted-space">                       </span>class="py-2 text-black border-b-2 border-wise-green font-semibold"</p>
-<p class="p1"><span class="Apple-converted-space">                       </span>onmouseover="toggleMegaMenu(true)"</p>
-<p class="p1"><span class="Apple-converted-space">                       </span>onmouseout="delayToggleMegaMenu(false)"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                       </span>Business</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;a href="#" class="py-2 hover:text-black"&gt;Platform&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Right Side: Utility Links and Sign Up --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex items-center space-x-4 text-sm font-medium"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;a href="#" class="text-wise-grey hover:text-wise-green"&gt;EN&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;a href="#" class="text-wise-grey hover:text-wise-green"&gt;Help&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;a href="#" class="text-wise-grey hover:text-wise-green"&gt;Log in&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="bg-wise-green text-white px-4 py-2 rounded-full font-semibold shadow-md hover:bg-wise-dark-green transition duration-200"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>Sign up</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/nav&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/header&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Mega Menu Container (Hidden by default) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="mega-menu"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">         </span>class="mega-menu fixed w-full bg-white border-b border-gray-200 shadow-xl"</p>
-<p class="p1"><span class="Apple-converted-space">         </span>onmouseover="toggleMegaMenu(true)"</p>
-<p class="p1"><span class="Apple-converted-space">         </span>onmouseout="delayToggleMegaMenu(false)"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex" id="mega-menu-content-flex"&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Column 1: Promotional/Image Block (w-1/4) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="w-1/4 pr-8 border-r border-gray-100"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;img src="https://placehold.co/200x120/E0F2F1/000?text=Team+Meeting"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                     </span>onerror="this.onerror=null;this.src='https://placehold.co/200x120/E0F2F1/000?text=WISE+Image'"</p>
-<p class="p1"><span class="Apple-converted-space">                     </span>alt="Wise Business Team"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                     </span>class="rounded-lg mb-4 w-full h-auto object-cover"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h3 class="text-xl font-bold text-wise-grey mb-2"&gt;WISE BUSINESS&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="text-sm text-gray-500 mb-4"&gt;The only account your start-up or scale-up needs to thrive internationally.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;a href="#" class="flex items-center text-wise-green font-medium text-sm hover:underline"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>Explore<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/svg&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Column 2: Features (w-1/4) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="w-1/4 px-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h4 class="text-wise-grey font-semibold mb-4"&gt;Features&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;ul class="space-y-3 text-sm" id="features-list"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li class="group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;a href="#" data-feature="Send Money" onmouseover="showSidePanel('Send Money', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="text-wise-green mr-2 text-xl"&gt;&amp;uarr;&lt;/span&gt; Send money</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li class="group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;a href="#" data-feature="Receive Money" onmouseover="showSidePanel('Receive Money', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="text-wise-green mr-2 text-xl"&gt;&amp;darr;&lt;/span&gt; Receive money</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li class="group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;a href="#" data-feature="Get a Business Card" onmouseover="showSidePanel('Get a Business Card', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="text-wise-green mr-2 text-xl"&gt;&amp;#9638;&lt;/span&gt; Get a business card</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li class="group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;a href="#" data-feature="Earn Returns" onmouseover="showSidePanel('Earn Returns', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="text-wise-green mr-2 text-xl"&gt;&amp;#36;&lt;/span&gt; Earn returns</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li class="group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;a href="#" data-feature="Manage Team Finances" onmouseover="showSidePanel('Manage Team Finances', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="text-wise-green mr-2 text-xl"&gt;&amp;#9881;&lt;/span&gt; Manage team finances</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li class="group"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;a href="#" data-feature="Connect Accounting Software" onmouseover="showSidePanel('Connect Accounting Software', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="text-wise-green mr-2 text-xl"&gt;&amp;#9901;&lt;/span&gt; Connect accounting software</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Column 3: Resources and Pricing (w-1/4) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Note: These columns are visually hidden behind the side panel when active, but still take up space for alignment --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="w-1/4 px-8 border-r border-gray-100"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h4 class="text-wise-grey font-semibold mb-4"&gt;Resources&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;ul class="space-y-3 text-sm"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li&gt;&lt;a href="#" class="text-gray-700 hover:text-wise-green"&gt;Explore API integrations&lt;/a&gt;&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li&gt;&lt;a href="#" class="text-gray-700 hover:text-wise-green"&gt;Try demo&lt;/a&gt;&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li&gt;&lt;a href="#" class="text-gray-700 hover:text-wise-green"&gt;Contact sales&lt;/a&gt;&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- Column 4: Pricing (w-1/4) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="w-1/4 pl-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h4 class="text-wise-grey font-semibold mb-4"&gt;Pricing&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;ul class="space-y-3 text-sm"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;li&gt;&lt;a href="#" class="text-gray-700 hover:text-wise-green font-semibold"&gt;Business pricing&lt;/a&gt;&lt;/li&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Side Panel (Positioned absolutely over Columns 3 &amp; 4) --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="side-panel" class="side-panel bg-white p-6"</p>
-<p class="p1"><span class="Apple-converted-space">             </span>onmouseover="sidePanelHover = true"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">             </span>onmouseout="sidePanelHover = false; delayHideSidePanel()"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="side-panel-content" class="h-full flex flex-col justify-between"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h2 class="text-base font-semibold mb-1 text-wise-grey" id="panel-title"&gt;Feature Title&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;ul class="feature-list" id="panel-items"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;!-- Dynamic list items will be inserted here --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;a href="#" id="panel-action-link" class="mt-6 inline-block bg-wise-green text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-wise-dark-green transition duration-200 text-center w-full max-w-[200px]"&gt;&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;!-- We hide the close button since the panel is driven by hover --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const megaMenu = document.getElementById('mega-menu');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const sidePanel = document.getElementById('side-panel');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const businessLink = document.getElementById('business-link');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const featuresList = document.getElementById('features-list');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>let hideMenuTimeout;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let hidePanelTimeout;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let sidePanelHover = false;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Data structure for panel content (Updated with SVG icon paths)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const featureContent = {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>'Send Money': {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>title: 'Send Money Capabilities',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'International &amp; FX transfers', icon: 'M12 2a10 10 0 0 0 10 10 10 10 0 0 0-10 10 10 10 0 0 0-10-10 10 10 0 0 0 10-10zM2 12h20' }, // Globe</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Batch payments', icon: 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' }, // Package</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Direct Debits', icon: 'M17 1l4 4-4 4M21 5H3M7 9L3 5l4-4M3 5h18' }, // Repeat</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Payment Approval', icon: 'M9 11l3 3 5-5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z' }, // CheckCircle</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Bill Pay &amp; Invoice upload', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6' } // FileText</p>
-<p class="p1"><span class="Apple-converted-space">                </span>],</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkText: 'Send money now',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkHref: '#'</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>'Receive Money': {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>title: 'Receive Money Capabilities',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Domestic &amp; SWIFT bank details', icon: 'M6 12h4m-4 4h4m10 4V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2z' }, // Banknote</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Multi-currency Direct Debits', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h4a3.5 3.5 0 0 1 0 7H6' }, // DollarSign</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Multi-currency Invoicing', icon: 'M4 8V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4M4 16v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4M8 12h8M12 10v4' }, // Receipt</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Payment links', icon: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' }, // Link</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Ecommerce plugins (Woo-commerce, Shopify etc)', icon: 'M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0' }, // ShoppingBag</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Get paid by Card &amp; local payment methods', icon: 'M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM2 13h20' } // CreditCard</p>
-<p class="p1"><span class="Apple-converted-space">                </span>],</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkText: 'Explore receiving options',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkHref: '#'</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Map "Get a Business Card" to the "Spend" list</p>
-<p class="p1"><span class="Apple-converted-space">            </span>'Get a Business Card': {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>title: 'Spend Management',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Unlimited Team &amp; Business debit cards', icon: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' }, // Users</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Expense Management', icon: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M8 2h8M9 13h6M9 17h6' }, // ClipboardList</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Spend Controls &amp; team budgets', icon: 'M12 1a2 2 0 0 0-2 2v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4V3a2 2 0 0 0-2-2z' }, // Lock</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: '0.5% Cashback', icon: 'M20 12V7H4v5M4 7l-1 5 1-5h16l-1 5 1-5zM12 22v-4M8 18h8M12 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z' }, // Gift</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Spend Analytics', icon: 'M12 20V10M18 20V4M6 20v-4' }, // BarChart2</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Pay by Direct Debits', icon: 'M17 1l4 4-4 4M21 5H3M7 9L3 5l4-4M3 5h18' } // Repeat</p>
-<p class="p1"><span class="Apple-converted-space">                </span>],</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkText: 'Get your business card',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkHref: '#'</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Map "Earn Returns" to the "Hold Money" list</p>
-<p class="p1"><span class="Apple-converted-space">            </span>'Earn Returns': {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>title: 'Holding &amp; Earnings',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Hold money in 50+ currencies', icon: 'M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h12a2 2 0 0 1 0 4H5a2 2 0 0 1 0 4h12a2 2 0 0 0 2-2v-3M5 3v18' }, // Wallet</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Earn interest', icon: 'M10 13l2 2 4-4 6 6M2 17h20M16 4h4v4' }, // TrendingUp</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Safeguard funds', icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4' }, // ShieldCheck</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Deposit Protection (FSCS &amp; FDIC etc)', icon: 'M12 18s-8-4-8-10 8-10 8-10 8 4 8 10-8 10-8 10zM12 18V6M12 18h0' } // Layers</p>
-<p class="p1"><span class="Apple-converted-space">                </span>],</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkText: 'Learn about Assets',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkHref: '#'</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Map "Manage Team Finances" to the "Spend" list (reusing content, as requested)</p>
-<p class="p1"><span class="Apple-converted-space">            </span>'Manage Team Finances': {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>title: 'Spend Management',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Unlimited Team &amp; Business debit cards', icon: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Expense Management', icon: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M8 2h8M9 13h6M9 17h6' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Spend Controls &amp; team budgets', icon: 'M12 1a2 2 0 0 0-2 2v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4V3a2 2 0 0 0-2-2z' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: '0.5% Cashback', icon: 'M20 12V7H4v5M4 7l-1 5 1-5h16l-1 5 1-5zM12 22v-4M8 18h8M12 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Spend Analytics', icon: 'M12 20V10M18 20V4M6 20v-4' },</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Pay by Direct Debits', icon: 'M17 1l4 4-4 4M21 5H3M7 9L3 5l4-4M3 5h18' }</p>
-<p class="p1"><span class="Apple-converted-space">                </span>],</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkText: 'Manage team access',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkHref: '#'</p>
-<p class="p1"><span class="Apple-converted-space">            </span>},</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Map "Connect Accounting Software" to a relevant set of items</p>
-<p class="p1"><span class="Apple-converted-space">            </span>'Connect Accounting Software': {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>title: 'Accounting Integrations',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>items: [</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Sync transactions with Xero, Quickbooks', icon: 'M10 20l4-16L2 12h14z' }, // Zap</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Simplify reconciliation', icon: 'M6 18c-3.3-1.83-2.16-5.43-1-6m5-2h6M4 14.5l-2 1M22 14.5l-2 1M11 20.5l-2 1M15 20.5l2 1' }, // HandCoins</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'Automated expense tracking', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 17h6M12 10v4' }, // FileClock</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>{ text: 'API integration support', icon: 'M16 18l4-4-4-4M8 18l-4-4 4-4' } // Code</p>
-<p class="p1"><span class="Apple-converted-space">                </span>],</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkText: 'View all integrations',</p>
-<p class="p1"><span class="Apple-converted-space">                </span>linkHref: '#'</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Standard SVG template helper function</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function getIconSvg(pathData) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;svg class="w-4 h-4 mr-2 text-wise-green flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;path stroke-linecap="round" stroke-linejoin="round" d="${pathData}" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/svg&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- Mega Menu Handlers (Unchanged) ---</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function toggleMegaMenu(show) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>clearTimeout(hideMenuTimeout);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (show) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>megaMenu.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>megaMenu.classList.remove('active');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Ensure side panel is also hidden when main menu closes</p>
-<p class="p1"><span class="Apple-converted-space">                </span>hideSidePanel();<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function delayToggleMegaMenu(show) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>clearTimeout(hideMenuTimeout);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Wait a short period before hiding, in case the user is moving mouse to menu</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!show) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>hideMenuTimeout = setTimeout(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>toggleMegaMenu(false);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}, 100);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- Side Panel Handlers (Updated) ---</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function showSidePanel(featureName, targetElement) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>clearTimeout(hidePanelTimeout);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const content = featureContent[featureName];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// 1. Calculate pointer position (Logic remains the same for arrow placement)</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const megaMenuRect = megaMenu.getBoundingClientRect();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const featuresListRect = featuresList.getBoundingClientRect();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const targetRect = targetElement.getBoundingClientRect();</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const listRelativeTop = featuresListRect.top - megaMenuRect.top;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const featureCenterY = (targetRect.top + targetRect.bottom) / 2 - megaMenuRect.top;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// The panel content starts at 2rem (32px) from the top of the overall mega menu content area.</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const panelPaddingTop = 32;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const featureCenterRelativeToPanelTop = featureCenterY - panelPaddingTop;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// The total height of the features list area</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const featureListAreaHeight = featuresListRect.height;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Pointer top percentage relative to the side panel's overall height</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const pointerTop = (featureCenterRelativeToPanelTop / featureListAreaHeight) * 100;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Set CSS variable for the arrow</p>
-<p class="p1"><span class="Apple-converted-space">            </span>sidePanel.style.setProperty('--pointer-top', `${pointerTop}%`);</p>
-<p class="p2"><br></p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// 2. Update panel content</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('panel-title').textContent = content.title;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const itemsContainer = document.getElementById('panel-items');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>itemsContainer.innerHTML = ''; // Clear old items</p>
-<p class="p1"><span class="Apple-converted-space">            </span>content.items.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const li = document.createElement('li');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Construct the hyperlink with the icon inside</p>
-<p class="p1"><span class="Apple-converted-space">                </span>li.innerHTML = `&lt;a href="#"&gt;${getIconSvg(item.icon)}${item.text}&lt;/a&gt;`;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>itemsContainer.appendChild(li);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Add action link (CTA)</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const actionLink = document.getElementById('panel-action-link');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>actionLink.textContent = content.linkText;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>actionLink.href = content.linkHref;<span class="Apple-converted-space"> </span></p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// 3. Set the panel to active</p>
-<p class="p1"><span class="Apple-converted-space">            </span>sidePanel.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>toggleMegaMenu(true); // Ensure main menu stays open</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function hideSidePanel() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>clearTimeout(hidePanelTimeout);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>sidePanel.classList.remove('active');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function delayHideSidePanel() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>clearTimeout(hidePanelTimeout);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Wait a short period before hiding the panel, checking if the mouse has moved into the panel itself</p>
-<p class="p1"><span class="Apple-converted-space">            </span>hidePanelTimeout = setTimeout(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Check if the mouse is still over the mega menu or the side panel</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const isOverMegaMenu = megaMenu.matches(':hover');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const isOverSidePanel = sidePanel.matches(':hover');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Only hide if the mouse is not over either</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!isOverMegaMenu &amp;&amp; !isOverSidePanel) {</p>
-<p class="p1"><span class="Apple-converted-space">                     </span>// We only hide the side panel here, let delayToggleMegaMenu handle the main menu</p>
-<p class="p1"><span class="Apple-converted-space">                     </span>hideSidePanel();<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}, 100);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- Initialization (Unchanged) ---</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Add event listeners to the main link for better reliability</p>
-<p class="p1"><span class="Apple-converted-space">        </span>businessLink.addEventListener('mouseenter', () =&gt; toggleMegaMenu(true));</p>
-<p class="p1"><span class="Apple-converted-space">        </span>businessLink.addEventListener('mouseleave', () =&gt; delayToggleMegaMenu(false));</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Add a general mouseleave handler for the features list container to initiate panel hiding if mouse moves out of features and panel.</p>
-<p class="p1"><span class="Apple-converted-space">        </span>featuresList.addEventListener('mouseleave', () =&gt; delayHideSidePanel());</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Also ensure all feature links use the updated onmouseover handler</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.querySelectorAll('.feature-link').forEach(link =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>link.onmouseover = function() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const featureName = this.getAttribute('data-feature');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showSidePanel(featureName, this);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p1"><span class="Apple-converted-space">            </span>link.onmouseout = function() {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Delay hiding when moving between links or moving out of the features column</p>
-<p class="p1"><span class="Apple-converted-space">                </span>delayHideSidePanel();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+<body class="pt-10">
+
+    <!-- Top Banner (as seen in image) -->
+    <div class="bg-wise-green text-white text-center py-2 text-sm">
+        Learn how Wise can help your business. <a href="#" class="underline font-semibold">Register for webinar on 14th October</a>
+        <button class="absolute right-4 top-2 text-white/80 hover:text-white">&times;</button>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="bg-white shadow-md z-50 sticky top-0">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Left Side: Logo and Main Tabs -->
+            <div class="flex items-center space-x-8">
+                <div class="font-extrabold text-2xl text-wise-grey">wise</div>
+                <div class="hidden sm:flex space-x-6 text-wise-grey text-sm font-medium">
+                    <a href="#" class="py-2 hover:text-black">Personal</a>
+                    <a href="#" 
+                       id="business-link"
+                       class="py-2 text-black border-b-2 border-wise-green font-semibold"
+                       onmouseover="toggleMegaMenu(true)"
+                       onmouseout="delayToggleMegaMenu(false)">
+                       Business
+                    </a>
+                    <a href="#" class="py-2 hover:text-black">Platform</a>
+                </div>
+            </div>
+            
+            <!-- Right Side: Utility Links and Sign Up -->
+            <div class="flex items-center space-x-4 text-sm font-medium">
+                <a href="#" class="text-wise-grey hover:text-wise-green">EN</a>
+                <a href="#" class="text-wise-grey hover:text-wise-green">Help</a>
+                <a href="#" class="text-wise-grey hover:text-wise-green">Log in</a>
+                <button class="bg-wise-green text-white px-4 py-2 rounded-full font-semibold shadow-md hover:bg-wise-dark-green transition duration-200">
+                    Sign up
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mega Menu Container (Hidden by default) -->
+    <div id="mega-menu" 
+         class="mega-menu fixed w-full bg-white border-b border-gray-200 shadow-xl"
+         onmouseover="toggleMegaMenu(true)"
+         onmouseout="delayToggleMegaMenu(false)">
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex" id="mega-menu-content-flex">
+            
+            <!-- Column 1: Promotional/Image Block (w-1/4) -->
+            <div class="w-1/4 pr-8 border-r border-gray-100">
+                <img src="https://placehold.co/200x120/E0F2F1/000?text=Team+Meeting" 
+                     onerror="this.onerror=null;this.src='https://placehold.co/200x120/E0F2F1/000?text=WISE+Image'"
+                     alt="Wise Business Team" 
+                     class="rounded-lg mb-4 w-full h-auto object-cover">
+                <h3 class="text-xl font-bold text-wise-grey mb-2">WISE BUSINESS</h3>
+                <p class="text-sm text-gray-500 mb-4">The only account your start-up or scale-up needs to thrive internationally.</p>
+                <a href="#" class="flex items-center text-wise-green font-medium text-sm hover:underline">
+                    Explore 
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Column 2: Features (w-1/4) -->
+            <div class="w-1/4 px-8">
+                <h4 class="text-wise-grey font-semibold mb-4">Features</h4>
+                <ul class="space-y-3 text-sm" id="features-list">
+                    <li class="group">
+                        <a href="#" data-feature="Send Money" onmouseover="showSidePanel('Send Money', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150">
+                            <span class="text-wise-green mr-2 text-xl">&uarr;</span> Send money
+                        </a>
+                    </li>
+                    <li class="group">
+                        <a href="#" data-feature="Receive Money" onmouseover="showSidePanel('Receive Money', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150">
+                            <span class="text-wise-green mr-2 text-xl">&darr;</span> Receive money
+                        </a>
+                    </li>
+                    <li class="group">
+                        <a href="#" data-feature="Get a Business Card" onmouseover="showSidePanel('Get a Business Card', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150">
+                            <span class="text-wise-green mr-2 text-xl">&#9638;</span> Get a business card
+                        </a>
+                    </li>
+                    <li class="group">
+                        <a href="#" data-feature="Earn Returns" onmouseover="showSidePanel('Earn Returns', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150">
+                            <span class="text-wise-green mr-2 text-xl">&#36;</span> Earn returns
+                        </a>
+                    </li>
+                    <li class="group">
+                        <a href="#" data-feature="Manage Team Finances" onmouseover="showSidePanel('Manage Team Finances', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150">
+                            <span class="text-wise-green mr-2 text-xl">&#9881;</span> Manage team finances
+                        </a>
+                    </li>
+                    <li class="group">
+                        <a href="#" data-feature="Connect Accounting Software" onmouseover="showSidePanel('Connect Accounting Software', this)" onmouseout="delayHideSidePanel()" class="feature-link flex items-center text-gray-700 hover:text-wise-green transition duration-150">
+                            <span class="text-wise-green mr-2 text-xl">&#9901;</span> Connect accounting software
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Resources and Pricing (w-1/4) -->
+            <!-- Note: These columns are visually hidden behind the side panel when active, but still take up space for alignment -->
+            <div class="w-1/4 px-8 border-r border-gray-100">
+                <h4 class="text-wise-grey font-semibold mb-4">Resources</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#" class="text-gray-700 hover:text-wise-green">Explore API integrations</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-wise-green">Try demo</a></li>
+                    <li><a href="#" class="text-gray-700 hover:text-wise-green">Contact sales</a></li>
+                </ul>
+            </div>
+            
+            <!-- Column 4: Pricing (w-1/4) -->
+            <div class="w-1/4 pl-8">
+                <h4 class="text-wise-grey font-semibold mb-4">Pricing</h4>
+                <ul class="space-y-3 text-sm">
+                    <li><a href="#" class="text-gray-700 hover:text-wise-green font-semibold">Business pricing</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Side Panel (Positioned absolutely over Columns 3 & 4) -->
+        <div id="side-panel" class="side-panel bg-white p-6"
+             onmouseover="sidePanelHover = true" 
+             onmouseout="sidePanelHover = false; delayHideSidePanel()">
+            <div id="side-panel-content" class="h-full flex flex-col justify-between">
+                <div>
+                    <h2 class="text-base font-semibold mb-1 text-wise-grey" id="panel-title">Feature Title</h2>
+                    <ul class="feature-list" id="panel-items">
+                        <!-- Dynamic list items will be inserted here -->
+                    </ul>
+                </div>
+                <a href="#" id="panel-action-link" class="mt-6 inline-block bg-wise-green text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-wise-dark-green transition duration-200 text-center w-full max-w-[200px]"></a>
+            </div>
+            <!-- We hide the close button since the panel is driven by hover -->
+        </div>
+
+    </div>
+
+
+    <script>
+        const megaMenu = document.getElementById('mega-menu');
+        const sidePanel = document.getElementById('side-panel');
+        const businessLink = document.getElementById('business-link');
+        const featuresList = document.getElementById('features-list');
+
+        let hideMenuTimeout;
+        let hidePanelTimeout;
+        let sidePanelHover = false;
+        
+        // Data structure for panel content (Updated with SVG icon paths)
+        const featureContent = {
+            'Send Money': {
+                title: 'Send Money Capabilities',
+                items: [
+                    { text: 'International & FX transfers', icon: 'M12 2a10 10 0 0 0 10 10 10 10 0 0 0-10 10 10 10 0 0 0-10-10 10 10 0 0 0 10-10zM2 12h20' }, // Globe
+                    { text: 'Batch payments', icon: 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5' }, // Package
+                    { text: 'Direct Debits', icon: 'M17 1l4 4-4 4M21 5H3M7 9L3 5l4-4M3 5h18' }, // Repeat
+                    { text: 'Payment Approval', icon: 'M9 11l3 3 5-5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z' }, // CheckCircle
+                    { text: 'Bill Pay & Invoice upload', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6' } // FileText
+                ],
+                linkText: 'Send money now',
+                linkHref: '#'
+            },
+            'Receive Money': {
+                title: 'Receive Money Capabilities',
+                items: [
+                    { text: 'Domestic & SWIFT bank details', icon: 'M6 12h4m-4 4h4m10 4V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2z' }, // Banknote
+                    { text: 'Multi-currency Direct Debits', icon: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h4a3.5 3.5 0 0 1 0 7H6' }, // DollarSign
+                    { text: 'Multi-currency Invoicing', icon: 'M4 8V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4M4 16v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4M8 12h8M12 10v4' }, // Receipt
+                    { text: 'Payment links', icon: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71' }, // Link
+                    { text: 'Ecommerce plugins (Woo-commerce, Shopify etc)', icon: 'M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0' }, // ShoppingBag
+                    { text: 'Get paid by Card & local payment methods', icon: 'M4 6h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zM2 13h20' } // CreditCard
+                ],
+                linkText: 'Explore receiving options',
+                linkHref: '#'
+            },
+            // Map "Get a Business Card" to the "Spend" list
+            'Get a Business Card': {
+                title: 'Spend Management',
+                items: [
+                    { text: 'Unlimited Team & Business debit cards', icon: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' }, // Users
+                    { text: 'Expense Management', icon: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M8 2h8M9 13h6M9 17h6' }, // ClipboardList
+                    { text: 'Spend Controls & team budgets', icon: 'M12 1a2 2 0 0 0-2 2v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4V3a2 2 0 0 0-2-2z' }, // Lock
+                    { text: '0.5% Cashback', icon: 'M20 12V7H4v5M4 7l-1 5 1-5h16l-1 5 1-5zM12 22v-4M8 18h8M12 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z' }, // Gift
+                    { text: 'Spend Analytics', icon: 'M12 20V10M18 20V4M6 20v-4' }, // BarChart2
+                    { text: 'Pay by Direct Debits', icon: 'M17 1l4 4-4 4M21 5H3M7 9L3 5l4-4M3 5h18' } // Repeat
+                ],
+                linkText: 'Get your business card',
+                linkHref: '#'
+            },
+            // Map "Earn Returns" to the "Hold Money" list
+            'Earn Returns': {
+                title: 'Holding & Earnings',
+                items: [
+                    { text: 'Hold money in 50+ currencies', icon: 'M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h12a2 2 0 0 1 0 4H5a2 2 0 0 1 0 4h12a2 2 0 0 0 2-2v-3M5 3v18' }, // Wallet
+                    { text: 'Earn interest', icon: 'M10 13l2 2 4-4 6 6M2 17h20M16 4h4v4' }, // TrendingUp
+                    { text: 'Safeguard funds', icon: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4' }, // ShieldCheck
+                    { text: 'Deposit Protection (FSCS & FDIC etc)', icon: 'M12 18s-8-4-8-10 8-10 8-10 8 4 8 10-8 10-8 10zM12 18V6M12 18h0' } // Layers
+                ],
+                linkText: 'Learn about Assets',
+                linkHref: '#'
+            },
+            // Map "Manage Team Finances" to the "Spend" list (reusing content, as requested)
+            'Manage Team Finances': {
+                title: 'Spend Management',
+                items: [
+                    { text: 'Unlimited Team & Business debit cards', icon: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' },
+                    { text: 'Expense Management', icon: 'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M8 2h8M9 13h6M9 17h6' },
+                    { text: 'Spend Controls & team budgets', icon: 'M12 1a2 2 0 0 0-2 2v3H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4V3a2 2 0 0 0-2-2z' },
+                    { text: '0.5% Cashback', icon: 'M20 12V7H4v5M4 7l-1 5 1-5h16l-1 5 1-5zM12 22v-4M8 18h8M12 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4z' },
+                    { text: 'Spend Analytics', icon: 'M12 20V10M18 20V4M6 20v-4' },
+                    { text: 'Pay by Direct Debits', icon: 'M17 1l4 4-4 4M21 5H3M7 9L3 5l4-4M3 5h18' }
+                ],
+                linkText: 'Manage team access',
+                linkHref: '#'
+            },
+            // Map "Connect Accounting Software" to a relevant set of items
+            'Connect Accounting Software': {
+                title: 'Accounting Integrations',
+                items: [
+                    { text: 'Sync transactions with Xero, Quickbooks', icon: 'M10 20l4-16L2 12h14z' }, // Zap
+                    { text: 'Simplify reconciliation', icon: 'M6 18c-3.3-1.83-2.16-5.43-1-6m5-2h6M4 14.5l-2 1M22 14.5l-2 1M11 20.5l-2 1M15 20.5l2 1' }, // HandCoins
+                    { text: 'Automated expense tracking', icon: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 17h6M12 10v4' }, // FileClock
+                    { text: 'API integration support', icon: 'M16 18l4-4-4-4M8 18l-4-4 4-4' } // Code
+                ],
+                linkText: 'View all integrations',
+                linkHref: '#'
+            }
+        };
+
+        // Standard SVG template helper function
+        function getIconSvg(pathData) {
+            return `
+                <svg class="w-4 h-4 mr-2 text-wise-green flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="${pathData}" />
+                </svg>
+            `;
+        }
+
+        // --- Mega Menu Handlers (Non-async) ---
+        
+        function toggleMegaMenu(show) {
+            clearTimeout(hideMenuTimeout);
+
+            if (show) {
+                megaMenu.classList.add('active');
+            } else {
+                megaMenu.classList.remove('active');
+                // Ensure side panel is also hidden when main menu closes
+                hideSidePanel(); 
+            }
+        }
+
+        function delayToggleMegaMenu(show) {
+            clearTimeout(hideMenuTimeout);
+            // Wait a short period before hiding, in case the user is moving mouse to menu
+            if (!show) {
+                hideMenuTimeout = setTimeout(() => {
+                    toggleMegaMenu(false);
+                }, 100); 
+            }
+        }
+
+        // --- Side Panel Handlers (Non-async) ---
+
+        function showSidePanel(featureName, targetElement) {
+            clearTimeout(hidePanelTimeout);
+            const content = featureContent[featureName];
+
+            // 1. Calculate pointer position (Logic remains the same for arrow placement)
+            const megaMenuRect = megaMenu.getBoundingClientRect();
+            const featuresListRect = featuresList.getBoundingClientRect();
+            const targetRect = targetElement.getBoundingClientRect();
+
+            const listRelativeTop = featuresListRect.top - megaMenuRect.top;
+            const featureCenterY = (targetRect.top + targetRect.bottom) / 2 - megaMenuRect.top;
+            
+            // The panel content starts at 2rem (32px) from the top of the overall mega menu content area.
+            const panelPaddingTop = 32; 
+            const featureCenterRelativeToPanelTop = featureCenterY - panelPaddingTop;
+            
+            // The total height of the features list area
+            const featureListAreaHeight = featuresListRect.height;
+            
+            // Pointer top percentage relative to the side panel's overall height
+            const pointerTop = (featureCenterRelativeToPanelTop / featureListAreaHeight) * 100;
+            
+            // Set CSS variable for the arrow
+            sidePanel.style.setProperty('--pointer-top', `${pointerTop}%`);
+
+
+            // 2. Update panel content
+            document.getElementById('panel-title').textContent = content.title;
+            
+            const itemsContainer = document.getElementById('panel-items');
+            itemsContainer.innerHTML = ''; // Clear old items
+            content.items.forEach(item => {
+                const li = document.createElement('li');
+                // Construct the hyperlink with the icon inside
+                li.innerHTML = `<a href="#">${getIconSvg(item.icon)}${item.text}</a>`; 
+                itemsContainer.appendChild(li);
+            });
+            
+            // Add action link (CTA)
+            const actionLink = document.getElementById('panel-action-link');
+            actionLink.textContent = content.linkText;
+            actionLink.href = content.linkHref; 
+
+            // 3. Set the panel to active
+            sidePanel.classList.add('active');
+            toggleMegaMenu(true); // Ensure main menu stays open
+        }
+
+        function hideSidePanel() {
+            clearTimeout(hidePanelTimeout);
+            sidePanel.classList.remove('active');
+        }
+
+        function delayHideSidePanel() {
+            clearTimeout(hidePanelTimeout);
+            // Wait a short period before hiding the panel, checking if the mouse has moved into the panel itself
+            hidePanelTimeout = setTimeout(() => {
+                // Check if the mouse is still over the mega menu or the side panel
+                const isOverMegaMenu = megaMenu.matches(':hover');
+                const isOverSidePanel = sidePanel.matches(':hover');
+
+                // Only hide if the mouse is not over either
+                if (!isOverMegaMenu && !isOverSidePanel) {
+                     // We only hide the side panel here, let delayToggleMegaMenu handle the main menu
+                     hideSidePanel(); 
+                }
+            }, 100);
+        }
+        
+        // --- Initialization (Unchanged) ---
+
+        // Add event listeners to the main link for better reliability
+        businessLink.addEventListener('mouseenter', () => toggleMegaMenu(true));
+        businessLink.addEventListener('mouseleave', () => delayToggleMegaMenu(false));
+
+        // Add a general mouseleave handler for the features list container to initiate panel hiding if mouse moves out of features and panel.
+        featuresList.addEventListener('mouseleave', () => delayHideSidePanel());
+        
+        // Also ensure all feature links use the updated onmouseover handler
+        document.querySelectorAll('.feature-link').forEach(link => {
+            link.onmouseover = function() {
+                const featureName = this.getAttribute('data-feature');
+                showSidePanel(featureName, this);
+            };
+            link.onmouseout = function() {
+                // Delay hiding when moving between links or moving out of the features column
+                delayHideSidePanel();
+            };
+        });
+    </script>
 </body>
 </html>
+
