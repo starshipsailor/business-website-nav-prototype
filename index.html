@@ -17,12 +17,21 @@
         }
         /* Tailwind configuration for custom colors */
         .mega-menu {
+            /* --- CRITICAL FIXES FOR DROPDOWN VISIBILITY --- */
+            position: absolute; /* Changed from fixed to absolute for better flow */
+            top: 4rem; /* Height of the header (64px) to position it right below the nav */
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 55; /* Slightly higher than header (50) */
+            /* ----------------------------------------------- */
+
             transition: all 0.3s ease-in-out;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-5px);
             pointer-events: none;
-            z-index: 50;
+            
             position: relative; /* CRITICAL: Enables absolute positioning of side-panel inside */
         }
         .mega-menu.active {
@@ -30,6 +39,11 @@
             visibility: visible;
             transform: translateY(0);
             pointer-events: auto;
+        }
+        
+        /* Adjust header z-index to be lower than menu when active */
+        .main-header {
+            z-index: 50; 
         }
 
         /* Styling for the new localized side panel */
@@ -121,7 +135,7 @@
     </div>
 
     <!-- Main Navigation Bar -->
-    <header class="bg-white shadow-md z-50 sticky top-0">
+    <header class="bg-white shadow-md z-50 sticky top-0 main-header">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Left Side: Logo and Main Tabs -->
             <div class="flex items-center space-x-8">
@@ -153,7 +167,7 @@
 
     <!-- Mega Menu Container (Hidden by default) -->
     <div id="mega-menu" 
-         class="mega-menu fixed w-full bg-white border-b border-gray-200 shadow-xl"
+         class="mega-menu w-full bg-white border-b border-gray-200 shadow-xl"
          onmouseover="toggleMegaMenu(true)"
          onmouseout="delayToggleMegaMenu(false)">
         
