@@ -14,16 +14,20 @@
             font-family: 'Inter', sans-serif;
             background-color: #f8f8f8;
             height: 200vh; /* Add height for scrolling visibility */
+            /* Added padding-top to account for fixed header + top banner height */
+            padding-top: calc(4rem + 32px); /* Header is h-16 (4rem), Banner is approx 32px */
         }
+        
         /* Tailwind configuration for custom colors */
         .mega-menu {
             /* --- CRITICAL FIXES FOR DROPDOWN VISIBILITY --- */
-            position: absolute; /* Changed from fixed to absolute for better flow */
-            top: 4rem; /* Height of the header (64px) to position it right below the nav */
+            /* Use fixed position for reliable viewport placement */
+            position: fixed; 
+            top: 0; /* Will be overwritten by JS on activation */
             left: 0;
             right: 0;
             width: 100%;
-            z-index: 55; /* Slightly higher than header (50) */
+            z-index: 55;
             /* ----------------------------------------------- */
 
             transition: all 0.3s ease-in-out;
@@ -41,9 +45,9 @@
             pointer-events: auto;
         }
         
-        /* Adjust header z-index to be lower than menu when active */
+        /* Set header to fixed for consistency */
         .main-header {
-            z-index: 50; 
+            z-index: 60; /* Higher than menu so it stays on top */
         }
 
         /* Styling for the new localized side panel */
@@ -127,15 +131,14 @@
     </script>
 </head>
 <body class="pt-10">
-
-    <!-- Top Banner (as seen in image) -->
-    <div class="bg-wise-green text-white text-center py-2 text-sm">
+    
+    <div id="top-banner" class="bg-wise-green text-white text-center py-2 text-sm z-70 w-full fixed top-0" style="height: 32px;">
         Learn how Wise can help your business. <a href="#" class="underline font-semibold">Register for webinar on 14th October</a>
-        <button class="absolute right-4 top-2 text-white/80 hover:text-white">&times;</button>
+        <button class="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white">&times;</button>
     </div>
 
-    <!-- Main Navigation Bar -->
-    <header class="bg-white shadow-md z-50 sticky top-0 main-header">
+    <!-- Main Navigation Bar - Now fixed -->
+    <header class="bg-white shadow-md z-60 w-full fixed top-8 main-header" id="main-header" style="top: 32px;">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Left Side: Logo and Main Tabs -->
             <div class="flex items-center space-x-8">
@@ -271,6 +274,8 @@
         const sidePanel = document.getElementById('side-panel');
         const businessLink = document.getElementById('business-link');
         const featuresList = document.getElementById('features-list');
+        const mainHeader = document.getElementById('main-header'); // Get the header element
+        const topBanner = document.getElementById('top-banner'); // Get the top banner
 
         let hideMenuTimeout;
         let hidePanelTimeout;
@@ -372,17 +377,20 @@
             clearTimeout(hideMenuTimeout);
 
             if (show) {
+                // *** CRITICAL FIX: Dynamically set the top position ***
+                const headerHeight = mainHeader.offsetHeight;
+                const bannerHeight = topBanner.offsetHeight || 0;
+                megaMenu.style.top = `${headerHeight + bannerHeight}px`;
+
                 megaMenu.classList.add('active');
             } else {
                 megaMenu.classList.remove('active');
-                // Ensure side panel is also hidden when main menu closes
                 hideSidePanel(); 
             }
         }
 
         function delayToggleMegaMenu(show) {
             clearTimeout(hideMenuTimeout);
-            // Wait a short period before hiding, in case the user is moving mouse to menu
             if (!show) {
                 hideMenuTimeout = setTimeout(() => {
                     toggleMegaMenu(false);
@@ -396,23 +404,21 @@
             clearTimeout(hidePanelTimeout);
             const content = featureContent[featureName];
 
-            // 1. Calculate pointer position (Logic remains the same for arrow placement)
+            // 1. Calculate pointer position
             const megaMenuRect = megaMenu.getBoundingClientRect();
             const featuresListRect = featuresList.getBoundingClientRect();
             const targetRect = targetElement.getBoundingClientRect();
 
-            const listRelativeTop = featuresListRect.top - megaMenuRect.top;
-            const featureCenterY = (targetRect.top + targetRect.bottom) / 2 - megaMenuRect.top;
+            // Calculate vertical center of the feature link relative to the start of the mega menu content
+            const featureCenterY = (targetRect.top + targetRect.bottom) / 2 - featuresListRect.top;
             
-            // The panel content starts at 2rem (32px) from the top of the overall mega menu content area.
-            const panelPaddingTop = 32; 
-            const featureCenterRelativeToPanelTop = featureCenterY - panelPaddingTop;
-            
-            // The total height of the features list area
-            const featureListAreaHeight = featuresListRect.height;
+            // The features list is already positioned inside the menu content area.
+            // We need the Y position relative to the side panel's top (which aligns with the content area's top)
+            const featureListAreaTopOffset = featuresListRect.top - megaMenuRect.top;
             
             // Pointer top percentage relative to the side panel's overall height
-            const pointerTop = (featureCenterRelativeToPanelTop / featureListAreaHeight) * 100;
+            // We use the full height of the features list area to calculate the percentage
+            const pointerTop = ((featureCenterY + featureListAreaTopOffset) / megaMenuRect.height) * 100;
             
             // Set CSS variable for the arrow
             sidePanel.style.setProperty('--pointer-top', `${pointerTop}%`);
@@ -425,7 +431,6 @@
             itemsContainer.innerHTML = ''; // Clear old items
             content.items.forEach(item => {
                 const li = document.createElement('li');
-                // Construct the hyperlink with the icon inside
                 li.innerHTML = `<a href="#">${getIconSvg(item.icon)}${item.text}</a>`; 
                 itemsContainer.appendChild(li);
             });
@@ -447,15 +452,11 @@
 
         function delayHideSidePanel() {
             clearTimeout(hidePanelTimeout);
-            // Wait a short period before hiding the panel, checking if the mouse has moved into the panel itself
             hidePanelTimeout = setTimeout(() => {
-                // Check if the mouse is still over the mega menu or the side panel
                 const isOverMegaMenu = megaMenu.matches(':hover');
                 const isOverSidePanel = sidePanel.matches(':hover');
 
-                // Only hide if the mouse is not over either
                 if (!isOverMegaMenu && !isOverSidePanel) {
-                     // We only hide the side panel here, let delayToggleMegaMenu handle the main menu
                      hideSidePanel(); 
                 }
             }, 100);
